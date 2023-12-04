@@ -1,46 +1,49 @@
 package dao
 
 import model.Reservation
+import service.ReservationFinder
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.math.abs
 
-class ReservationDaoImpl : ReservationDao {
-
-    private val reservationSet: MutableSet<Reservation> = mutableSetOf()
+class ReservationDaoImpl (
+    private val reservationFinder: ReservationFinder,
+    private val reservationRepo: ReservationRepo
+) : ReservationDao {
 
     override fun createReservation(reservation: Reservation): UUID {
-        // todo algorithm lies here. find if any reservation is within 90 mins of it
-        val doesReservationExist = reservationSet.any {
-            it.timeOfTheReservation == reservation.timeOfTheReservation
+        if (reservationFinder.isReservationValid(reservation)) {
+            throw java.lang.Exception("Time already booked")
         }
-        if (doesReservationExist) {
-            throw java.lang.Exception("Reservation already exists")
-        }
-        reservationSet.add(reservation)
+        reservationRepo.reservationSet.add(reservation)
         return reservation.id
     }
 
+
+
     override fun updateReservation(reservationId: UUID, updatedReservation: Reservation): UUID {
-        val initialReservation = reservationSet.find {
+        val initialReservation = reservationRepo.reservationSet.find {
             it.id == reservationId
         }
         if (initialReservation != null) {
-            reservationSet.remove(initialReservation)
+            reservationRepo.reservationSet.remove(initialReservation)
 
-            reservationSet.add(updatedReservation)
+            reservationRepo.reservationSet.add(updatedReservation)
         }
         return updatedReservation.id
     }
 
     override fun deleteReservation(reservationId: UUID): UUID {
-        reservationSet.removeIf {
+        reservationRepo.reservationSet.removeIf {
             it.id == reservationId
         }
         return reservationId
     }
 
     override fun getReservation(reservationId: UUID): Reservation {
-        val reservation = reservationSet.find {
+        val reservation = reservationRepo.reservationSet.find {
             it.id == reservationId
         } ?: throw java.lang.Exception("Element not found with id $reservationId")
 
@@ -48,7 +51,7 @@ class ReservationDaoImpl : ReservationDao {
     }
 
     override fun getReservationsOfTheDay(date: LocalDate): List<Reservation> {
-        val reservations = reservationSet.filter {
+        val reservations = reservationRepo.reservationSet.filter {
             it.dayOfTheReservation == date
         }
         return reservations
