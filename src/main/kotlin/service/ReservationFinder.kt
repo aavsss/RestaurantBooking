@@ -10,20 +10,22 @@ class ReservationFinder (
     private val reservationRepo: ReservationRepo
 ) {
     fun isReservationValid(reservationToAdd: Reservation): Boolean {
-        val areTablesAvailable = reservationRepo.reservationSet.any {
-            (reservationRepo.totalNumberOfTables * reservationRepo.numberOfSeatingsPerTable) > reservationToAdd.totalNumberOfPeople
-        }
-        if (!areTablesAvailable) {
-            return false
-        }
-
-        val doesReservationExist = reservationRepo.reservationSet.any {
+        val reservationsWithin90Mins = reservationRepo.reservationSet.filter {
             isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
         }
-        if (doesReservationExist) {
-            return false
+        val numberOfTablesNeeded = (reservationToAdd.totalNumberOfPeople / reservationRepo.numberOfSeatingsPerTable)
+
+        if (reservationsWithin90Mins.isNotEmpty()) {
+            val numberOfTablesTaken = reservationsWithin90Mins.sumOf {
+                (it.totalNumberOfPeople) / reservationRepo.numberOfSeatingsPerTable // does not work with odd number of people
+            }
+
+            if (
+                (numberOfTablesTaken + numberOfTablesNeeded) >= reservationRepo.totalNumberOfTables
+            ) return false
         }
 
+        if (numberOfTablesNeeded >= reservationRepo.totalNumberOfTables) return false
         return true
     }
 

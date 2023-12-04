@@ -7,7 +7,9 @@ import service.ReservationFinder
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ReservationFinderTest {
     private lateinit var reservationRepo: ReservationRepo
@@ -34,6 +36,13 @@ class ReservationFinderTest {
                 ),
                 Reservation(
                     id = UUID.randomUUID(),
+                    name = "Reunion of Daleks",
+                    totalNumberOfPeople = 2,
+                    dayOfTheReservation = LocalDate.of(2023, 12, 1),
+                    timeOfTheReservation = LocalTime.of(7, 0),
+                ),
+                Reservation(
+                    id = UUID.randomUUID(),
                     name = "Doctor who anniversary",
                     totalNumberOfPeople = 3,
                     dayOfTheReservation = LocalDate.of(2023, 12, 2),
@@ -45,18 +54,54 @@ class ReservationFinderTest {
     }
 
     @Test
-    fun shouldPass() {
-        assertNotNull(reservationFinder)
-    }
-
-    @Test
-    fun createReservation_bookingWithin90Mins_CantBook() {
+    fun createReservation_bookingWithin90Mins_tablesAvailable_canBook() {
         val reservationToAdd = Reservation(
             id = UUID.randomUUID(),
             name = "Cyberman re-awakening",
             totalNumberOfPeople = 2,
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
-            timeOfTheReservation = LocalTime.of(9, 30)
+            timeOfTheReservation = LocalTime.of(6, 30)
         )
+        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        assertTrue(actual)
+    }
+
+    @Test
+    fun createReservation_bookingWithin90Mins_tablesRequiredExceedTotalAvailable_cantBook() {
+        val reservationToAdd = Reservation(
+            id = UUID.randomUUID(),
+            name = "Cyberman re-awakening 2",
+            totalNumberOfPeople = 10,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(6, 30)
+        )
+        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        assertFalse(actual)
+    }
+
+    @Test
+    fun createReservation_bookingWithin90Mins_tablesRequiredDoNotExceedTotalAvailable_cantBook() {
+        val reservationToAdd = Reservation(
+            id = UUID.randomUUID(),
+            name = "Cyberman re-awakening 2",
+            totalNumberOfPeople = 4,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(6, 30)
+        )
+        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        assertTrue(actual)
+    }
+
+    @Test
+    fun createReservation_bookingDoesntOverlap_tablesExceedMaxCapacity_cantBook() {
+        val reservationToAdd = Reservation(
+            id = UUID.randomUUID(),
+            name = "Cyberman re-awakening 2",
+            totalNumberOfPeople = 12,
+            dayOfTheReservation = LocalDate.of(2023, 12, 3),
+            timeOfTheReservation = LocalTime.of(6, 30)
+        )
+        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        assertFalse(actual)
     }
 }
