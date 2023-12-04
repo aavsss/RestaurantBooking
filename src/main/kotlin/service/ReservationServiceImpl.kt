@@ -10,22 +10,22 @@ class ReservationServiceImpl (
 ) : ReservationService {
 
     override fun createReservation(reservation: Reservation): UUID {
-        TODO("Not yet implemented")
+        return reservationDao.createReservation(reservation)
     }
 
     override fun updateReservation(reservationId: UUID, updatedReservation: Reservation): UUID {
-        TODO("Not yet implemented")
+        return reservationDao.updateReservation(reservationId, updatedReservation)
     }
 
     override fun deleteReservation(reservationId: UUID): UUID {
-        TODO("Not yet implemented")
+        return reservationDao.deleteReservation(reservationId)
     }
 
     override fun getReservation(reservationId: UUID): Reservation {
-        TODO("Not yet implemented")
+        return reservationDao.getReservation(reservationId)
     }
 
     override fun getReservationsOfTheDay(date: LocalDate): List<Reservation> {
-        TODO("Not yet implemented")
+        return reservationDao.getReservationsOfTheDay(date)
     }
 }

@@ -9,6 +9,13 @@ class ReservationDaoImpl : ReservationDao {
     private val reservationSet: MutableSet<Reservation> = mutableSetOf()
 
     override fun createReservation(reservation: Reservation): UUID {
+        // todo algorithm lies here. find if any reservation is within 90 mins of it
+        val doesReservationExist = reservationSet.any {
+            it.timeOfTheReservation == reservation.timeOfTheReservation
+        }
+        if (doesReservationExist) {
+            throw java.lang.Exception("Reservation already exists")
+        }
         reservationSet.add(reservation)
         return reservation.id
     }
