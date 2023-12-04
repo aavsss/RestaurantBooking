@@ -13,20 +13,25 @@ class ReservationFinder (
         val reservationsWithin90Mins = reservationRepo.reservationSet.filter {
             isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
         }
-        val numberOfTablesNeeded = (reservationToAdd.totalNumberOfPeople / reservationRepo.numberOfSeatingsPerTable)
+        val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / reservationRepo.numberOfSeatingsPerTable)
 
         if (reservationsWithin90Mins.isNotEmpty()) {
             val numberOfTablesTaken = reservationsWithin90Mins.sumOf {
-                (it.totalNumberOfPeople) / reservationRepo.numberOfSeatingsPerTable // does not work with odd number of people
+                (addOneToSeatIfOddNumberOfPeople(it.totalNumberOfPeople)) / reservationRepo.numberOfSeatingsPerTable
             }
 
             if (
-                (numberOfTablesTaken + numberOfTablesNeeded) >= reservationRepo.totalNumberOfTables
+                (numberOfTablesTaken + numberOfTablesNeeded) > reservationRepo.totalNumberOfTables
             ) return false
         }
 
-        if (numberOfTablesNeeded >= reservationRepo.totalNumberOfTables) return false
+        if (numberOfTablesNeeded > reservationRepo.totalNumberOfTables) return false
         return true
+    }
+
+    private fun addOneToSeatIfOddNumberOfPeople(numberOfPeople: Int): Int {
+        if (numberOfPeople % 2 == 1) return numberOfPeople + 1
+        return numberOfPeople
     }
 
     private fun isWithin90Minutes(time1: LocalTime, time2: LocalTime): Boolean {

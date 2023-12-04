@@ -104,4 +104,17 @@ class ReservationFinderTest {
         val actual = reservationFinder.isReservationValid(reservationToAdd)
         assertFalse(actual)
     }
+
+    @Test
+    fun createReservation_bookingOverlaps_oddNumberOfPeople_tablesExceedMaxCapacity_cantBook() {
+        val reservationToAdd = Reservation(
+            id = UUID.randomUUID(),
+            name = "Cyberman re-awakening 2",
+            totalNumberOfPeople = 7,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(6, 30)
+        )
+        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        assertFalse(actual)
+    }
 }
