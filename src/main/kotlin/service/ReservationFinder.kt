@@ -4,14 +4,16 @@ import dao.ReservationRepo
 import model.Reservation
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 import kotlin.math.abs
 
 class ReservationFinder (
     private val reservationRepo: ReservationRepo
 ) {
-    fun isReservationValid(reservationToAdd: Reservation): Boolean {
-        val reservationsWithin90Mins = reservationRepo.reservationSet.filter {
-            isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
+    fun isReservationValidToUpsert(reservationToAdd: Reservation, reservationIdsToExclude: List<UUID> = emptyList()): Boolean {
+        val reservationsWithin90Mins = reservationRepo.reservationSet
+            .filter { !reservationIdsToExclude.contains(it.id) }
+            .filter {isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
         }
         val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / reservationRepo.numberOfSeatingsPerTable)
 
@@ -27,6 +29,20 @@ class ReservationFinder (
 
         if (numberOfTablesNeeded > reservationRepo.totalNumberOfTables) return false
         return true
+    }
+
+    fun findAlternateDates(): List<LocalTime> {
+        val currentTime = reservationRepo.startTime
+        val times = mutableListOf<LocalTime>()
+        while (currentTime.isBefore(reservationRepo.endTime)) {
+            val free90MinWindow = reservationRepo.reservationSet
+                .any { isWithin90Minutes(it.timeOfTheReservation, currentTime) }
+            if (!free90MinWindow) {
+                times.add(currentTime)
+            }
+            currentTime.plusMinutes(30)
+        }
+        return times
     }
 
     private fun addOneToSeatIfOddNumberOfPeople(numberOfPeople: Int): Int {

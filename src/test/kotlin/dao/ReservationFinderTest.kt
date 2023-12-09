@@ -8,7 +8,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class ReservationFinderTest {
@@ -62,7 +61,7 @@ class ReservationFinderTest {
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
             timeOfTheReservation = LocalTime.of(6, 30)
         )
-        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertTrue(actual)
     }
 
@@ -75,7 +74,7 @@ class ReservationFinderTest {
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
             timeOfTheReservation = LocalTime.of(6, 30)
         )
-        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)
     }
 
@@ -88,7 +87,7 @@ class ReservationFinderTest {
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
             timeOfTheReservation = LocalTime.of(6, 30)
         )
-        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertTrue(actual)
     }
 
@@ -101,7 +100,7 @@ class ReservationFinderTest {
             dayOfTheReservation = LocalDate.of(2023, 12, 3),
             timeOfTheReservation = LocalTime.of(6, 30)
         )
-        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)
     }
 
@@ -114,7 +113,7 @@ class ReservationFinderTest {
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
             timeOfTheReservation = LocalTime.of(6, 30)
         )
-        val actual = reservationFinder.isReservationValid(reservationToAdd)
+        val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)
     }
 }

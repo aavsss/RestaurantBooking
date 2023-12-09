@@ -3,10 +3,7 @@ package dao
 import model.Reservation
 import service.ReservationFinder
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.math.abs
 
 class ReservationDaoImpl (
     private val reservationFinder: ReservationFinder,
@@ -14,21 +11,24 @@ class ReservationDaoImpl (
 ) : ReservationDao {
 
     override fun createReservation(reservation: Reservation): UUID {
-        if (reservationFinder.isReservationValid(reservation)) {
-            throw java.lang.Exception("Time already booked")
+        if (!reservationFinder.isReservationValidToUpsert(reservation)) {
+            println("Alternate spots")
+            reservationFinder.findAlternateDates().forEach { println(it) }
+            throw Exception("Time already booked. Pick some other time")
         }
         reservationRepo.reservationSet.add(reservation)
         return reservation.id
     }
 
-
-
     override fun updateReservation(reservationId: UUID, updatedReservation: Reservation): UUID {
-        val initialReservation = reservationRepo.reservationSet.find {
-            it.id == reservationId
-        }
-        if (initialReservation != null) {
-            reservationRepo.reservationSet.remove(initialReservation)
+        val initialReservation = reservationFinder.isReservationValidToUpsert(
+            updatedReservation,
+            listOf(reservationId)
+        )
+        if (initialReservation) {
+            reservationRepo.reservationSet.removeIf {
+                it.id == reservationId
+            }
 
             reservationRepo.reservationSet.add(updatedReservation)
         }
