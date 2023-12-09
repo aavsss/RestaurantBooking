@@ -7,7 +7,9 @@ import service.ReservationFinder
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class ReservationFinderTest {
@@ -115,5 +117,11 @@ class ReservationFinderTest {
         )
         val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)
+    }
+
+    @Test
+    fun findAlternateDates_listsDatesAsExpected_defaultData() {
+        val dates = reservationFinder.findAlternateDates(LocalDate.of(2023, 12, 1))
+        assertEquals(1, dates.size)
     }
 }

@@ -10,4 +10,5 @@ interface ReservationDao {
     fun deleteReservation(reservationId: UUID): UUID
     fun getReservation(reservationId: UUID): Reservation
     fun getReservationsOfTheDay(date: LocalDate): List<Reservation>
+    fun getSummary(dateOfReservation: LocalDate): String
 }

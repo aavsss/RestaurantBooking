@@ -2,6 +2,7 @@ package service
 
 import dao.ReservationRepo
 import model.Reservation
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -31,16 +32,17 @@ class ReservationFinder (
         return true
     }
 
-    fun findAlternateDates(): List<LocalTime> {
-        val currentTime = reservationRepo.startTime
+    fun findAlternateDates(dayOfTheReservation: LocalDate): List<LocalTime> {
+        var currentTime = reservationRepo.startTime
         val times = mutableListOf<LocalTime>()
         while (currentTime.isBefore(reservationRepo.endTime)) {
             val free90MinWindow = reservationRepo.reservationSet
+                .filter { it.dayOfTheReservation == dayOfTheReservation }
                 .any { isWithin90Minutes(it.timeOfTheReservation, currentTime) }
             if (!free90MinWindow) {
                 times.add(currentTime)
             }
-            currentTime.plusMinutes(30)
+            currentTime = currentTime.plusMinutes(30)
         }
         return times
     }

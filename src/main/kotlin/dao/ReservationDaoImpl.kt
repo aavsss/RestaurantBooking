@@ -12,9 +12,8 @@ class ReservationDaoImpl (
 
     override fun createReservation(reservation: Reservation): UUID {
         if (!reservationFinder.isReservationValidToUpsert(reservation)) {
-            println("Alternate spots")
-            reservationFinder.findAlternateDates().forEach { println(it) }
-            throw Exception("Time already booked. Pick some other time")
+            val alternateTimes = reservationFinder.findAlternateDates(reservation.dayOfTheReservation)
+            throw Exception("Time already booked. Pick some other time: $alternateTimes")
         }
         reservationRepo.reservationSet.add(reservation)
         return reservation.id
@@ -55,5 +54,12 @@ class ReservationDaoImpl (
             it.dayOfTheReservation == date
         }
         return reservations
+    }
+
+    override fun getSummary(dateOfReservation: LocalDate): String {
+        val numberOfPeople = reservationRepo.reservationSet.sumOf {
+            it.totalNumberOfPeople
+        }
+        return "Summary of the day $dateOfReservation: $numberOfPeople"
     }
 }
