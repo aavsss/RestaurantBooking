@@ -8,14 +8,15 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 import kotlin.math.abs
 
-class ReservationFinder (
-    private val reservationRepo: ReservationRepo
+class ReservationFinder(
+    private val reservationRepo: ReservationRepo,
 ) {
     fun isReservationValidToUpsert(reservationToAdd: Reservation, reservationIdsToExclude: List<UUID> = emptyList()): Boolean {
         val reservationsWithin90Mins = reservationRepo.reservationSet
             .filter { !reservationIdsToExclude.contains(it.id) }
-            .filter {isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
-        }
+            .filter {
+                isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
+            }
         val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / reservationRepo.numberOfSeatingsPerTable)
 
         if (reservationsWithin90Mins.isNotEmpty()) {
@@ -25,7 +26,9 @@ class ReservationFinder (
 
             if (
                 (numberOfTablesTaken + numberOfTablesNeeded) > reservationRepo.totalNumberOfTables
-            ) return false
+            ) {
+                return false
+            }
         }
 
         if (numberOfTablesNeeded > reservationRepo.totalNumberOfTables) return false

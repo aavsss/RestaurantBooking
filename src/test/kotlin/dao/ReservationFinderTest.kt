@@ -9,7 +9,6 @@ import java.time.LocalTime
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class ReservationFinderTest {
@@ -49,7 +48,7 @@ class ReservationFinderTest {
                     dayOfTheReservation = LocalDate.of(2023, 12, 2),
                     timeOfTheReservation = LocalTime.of(3, 0),
                 ),
-            )
+            ),
         )
         this.reservationFinder = ReservationFinder(reservationRepo)
     }
@@ -61,7 +60,7 @@ class ReservationFinderTest {
             name = "Cyberman re-awakening",
             totalNumberOfPeople = 2,
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
-            timeOfTheReservation = LocalTime.of(6, 30)
+            timeOfTheReservation = LocalTime.of(6, 30),
         )
         val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertTrue(actual)
@@ -74,7 +73,7 @@ class ReservationFinderTest {
             name = "Cyberman re-awakening 2",
             totalNumberOfPeople = 10,
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
-            timeOfTheReservation = LocalTime.of(6, 30)
+            timeOfTheReservation = LocalTime.of(6, 30),
         )
         val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)
@@ -87,7 +86,7 @@ class ReservationFinderTest {
             name = "Cyberman re-awakening 2",
             totalNumberOfPeople = 4,
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
-            timeOfTheReservation = LocalTime.of(6, 30)
+            timeOfTheReservation = LocalTime.of(6, 30),
         )
         val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertTrue(actual)
@@ -100,7 +99,7 @@ class ReservationFinderTest {
             name = "Cyberman re-awakening 2",
             totalNumberOfPeople = 12,
             dayOfTheReservation = LocalDate.of(2023, 12, 3),
-            timeOfTheReservation = LocalTime.of(6, 30)
+            timeOfTheReservation = LocalTime.of(6, 30),
         )
         val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)
@@ -113,7 +112,7 @@ class ReservationFinderTest {
             name = "Cyberman re-awakening 2",
             totalNumberOfPeople = 7,
             dayOfTheReservation = LocalDate.of(2023, 12, 1),
-            timeOfTheReservation = LocalTime.of(6, 30)
+            timeOfTheReservation = LocalTime.of(6, 30),
         )
         val actual = reservationFinder.isReservationValidToUpsert(reservationToAdd)
         assertFalse(actual)

@@ -5,8 +5,8 @@ import model.Reservation
 import java.time.LocalDate
 import java.util.*
 
-class ReservationServiceImpl (
-    private val reservationDao: ReservationDao
+class ReservationServiceImpl(
+    private val reservationDao: ReservationDao,
 ) : ReservationService {
 
     override fun createReservation(reservation: Reservation): UUID {
@@ -27,5 +27,9 @@ class ReservationServiceImpl (
 
     override fun getReservationsOfTheDay(date: LocalDate): List<Reservation> {
         return reservationDao.getReservationsOfTheDay(date)
+    }
+
+    override fun getSummary(dateOfReservation: LocalDate): String {
+        return reservationDao.getSummary(dateOfReservation)
     }
 }

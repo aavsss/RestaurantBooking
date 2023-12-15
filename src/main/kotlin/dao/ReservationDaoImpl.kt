@@ -5,9 +5,9 @@ import service.ReservationFinder
 import java.time.LocalDate
 import java.util.*
 
-class ReservationDaoImpl (
+class ReservationDaoImpl(
     private val reservationFinder: ReservationFinder,
-    private val reservationRepo: ReservationRepo
+    private val reservationRepo: ReservationRepo,
 ) : ReservationDao {
 
     override fun createReservation(reservation: Reservation): UUID {
@@ -22,7 +22,7 @@ class ReservationDaoImpl (
     override fun updateReservation(reservationId: UUID, updatedReservation: Reservation): UUID {
         val initialReservation = reservationFinder.isReservationValidToUpsert(
             updatedReservation,
-            listOf(reservationId)
+            listOf(reservationId),
         )
         if (initialReservation) {
             reservationRepo.reservationSet.removeIf {
