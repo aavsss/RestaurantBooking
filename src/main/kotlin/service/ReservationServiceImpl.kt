@@ -24,9 +24,10 @@ class ReservationServiceImpl(
 
     override fun deleteReservation(reservationId: UUID): UUID? = runBlocking {
         return@runBlocking try {
-            reservationDao.deleteReservation(reservationId)
-        } catch (e: Exception) {
+            val deletedUuid = reservationDao.deleteReservation(reservationId)
             ReservationEventBusImpl.publish(reservationId)
+            deletedUuid
+        } catch (e: Exception) {
             null
         }
     }

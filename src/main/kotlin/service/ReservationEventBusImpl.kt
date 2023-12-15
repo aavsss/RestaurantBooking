@@ -22,5 +22,4 @@ object ReservationEventBusImpl {
                 onEvent(event)
             }
     }
-
 }

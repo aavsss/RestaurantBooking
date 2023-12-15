@@ -13,6 +13,11 @@ class ReservationDaoImpl(
     override fun createReservation(reservation: Reservation): UUID {
         if (!reservationFinder.isReservationValidToUpsert(reservation)) {
             val alternateTimes = reservationFinder.findAlternateDates(reservation.dayOfTheReservation)
+
+            // region beta
+            println("Added reservation to wait-list")
+            reservationRepo.waitList.add(reservation)
+            // endregion
             throw Exception("Time already booked. Pick some other time: $alternateTimes")
         }
         reservationRepo.reservationSet.add(reservation)
