@@ -35,9 +35,11 @@ class ReservationDaoImpl(
     }
 
     override fun deleteReservation(reservationId: UUID): UUID {
-        reservationRepo.reservationSet.removeIf {
+        val isRemoved = reservationRepo.reservationSet.removeIf {
             it.id == reservationId
         }
+
+        if (!isRemoved) throw Exception("Reservation not found")
         return reservationId
     }
 
