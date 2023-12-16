@@ -10,11 +10,16 @@ import java.util.*
 
 class ReservationServiceImpl(
     private val reservationDao: ReservationDao,
+    private val reservationFinder: ReservationFinder,
 ) : ReservationService {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun createReservation(reservation: Reservation): UUID {
+        if (!reservationFinder.isReservationValidToUpsert(reservation)) {
+            val alternateTimes = reservationFinder.findAlternateDates(reservation.dayOfTheReservation)
+            throw Exception("Time already booked. Pick some other time: $alternateTimes")
+        }
         return reservationDao.createReservation(reservation)
     }
 
@@ -42,5 +47,9 @@ class ReservationServiceImpl(
 
     override fun getSummary(dateOfReservation: LocalDate): String {
         return reservationDao.getSummary(dateOfReservation)
+    }
+
+    override fun addToWaitList(reservation: Reservation): UUID {
+        return reservationDao.addToWaitList(reservation)
     }
 }

@@ -10,7 +10,7 @@ class ReservationRepo {
 
     // restaurant config
     val totalNumberOfTables = 5
-    val numberOfSeatingsPerTable = 2
-    val startTime = LocalTime.of(4, 0, 0)
-    val endTime = LocalTime.of(9, 0, 0)
+    val numberOfSeatingPerTable = 2
+    val startTime: LocalTime = LocalTime.of(4, 0, 0)
+    val endTime: LocalTime = LocalTime.of(9, 0, 0)
 }

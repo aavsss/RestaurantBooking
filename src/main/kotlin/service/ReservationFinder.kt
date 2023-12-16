@@ -11,17 +11,20 @@ import kotlin.math.abs
 class ReservationFinder(
     private val reservationRepo: ReservationRepo,
 ) {
-    fun isReservationValidToUpsert(reservationToAdd: Reservation, reservationIdsToExclude: List<UUID> = emptyList()): Boolean {
+    fun isReservationValidToUpsert(
+        reservationToAdd: Reservation,
+        reservationIdsToExclude: List<UUID> = emptyList(),
+    ): Boolean {
         val reservationsWithin90Mins = reservationRepo.reservationSet
             .filter { !reservationIdsToExclude.contains(it.id) }
             .filter {
                 isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
             }
-        val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / reservationRepo.numberOfSeatingsPerTable)
+        val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / reservationRepo.numberOfSeatingPerTable)
 
         if (reservationsWithin90Mins.isNotEmpty()) {
             val numberOfTablesTaken = reservationsWithin90Mins.sumOf {
-                (addOneToSeatIfOddNumberOfPeople(it.totalNumberOfPeople)) / reservationRepo.numberOfSeatingsPerTable
+                (addOneToSeatIfOddNumberOfPeople(it.totalNumberOfPeople)) / reservationRepo.numberOfSeatingPerTable
             }
 
             if (

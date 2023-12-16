@@ -10,7 +10,7 @@ class ReservationEventListener(
     init {
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
-            ReservationEventBusImpl.subscribe<UUID> { uuid ->
+            ReservationEventBusImpl.subscribe<UUID> {
                 // get another reservation from wait-list
                 reservationRepo.reservationSet.add(
                     reservationRepo.waitList.pop(),

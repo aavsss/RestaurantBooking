@@ -11,15 +11,6 @@ class ReservationDaoImpl(
 ) : ReservationDao {
 
     override fun createReservation(reservation: Reservation): UUID {
-        if (!reservationFinder.isReservationValidToUpsert(reservation)) {
-            val alternateTimes = reservationFinder.findAlternateDates(reservation.dayOfTheReservation)
-
-            // region beta
-            println("Added reservation to wait-list")
-            reservationRepo.waitList.add(reservation)
-            // endregion
-            throw Exception("Time already booked. Pick some other time: $alternateTimes")
-        }
         reservationRepo.reservationSet.add(reservation)
         return reservation.id
     }
@@ -68,5 +59,14 @@ class ReservationDaoImpl(
             it.totalNumberOfPeople
         }
         return "Summary of the day $dateOfReservation: $numberOfPeople"
+    }
+
+    override fun getWaitList(): LinkedList<Reservation> {
+        return reservationRepo.waitList
+    }
+
+    override fun addToWaitList(reservation: Reservation): UUID {
+        reservationRepo.waitList.add(reservation)
+        return reservation.id
     }
 }
