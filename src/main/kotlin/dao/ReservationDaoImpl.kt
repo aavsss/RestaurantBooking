@@ -1,6 +1,7 @@
 package dao
 
 import model.Reservation
+import model.ReservationStatus
 import service.ReservationFinder
 import java.time.LocalDate
 import java.util.*
@@ -68,5 +69,17 @@ class ReservationDaoImpl(
     override fun addToWaitList(reservation: Reservation): UUID {
         reservationRepo.waitList.add(reservation)
         return reservation.id
+    }
+
+    override fun checkInReservation(reservationId: UUID): Reservation {
+        val reservation = getReservation(reservationId)
+        reservation.status = ReservationStatus.CHECKED_IN
+        return reservation
+    }
+
+    override fun checkoutReservation(reservationId: UUID): Reservation {
+        val reservation = getReservation(reservationId)
+        reservation.status = ReservationStatus.CHECKED_OUT
+        return reservation
     }
 }

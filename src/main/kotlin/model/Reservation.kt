@@ -11,4 +11,5 @@ data class Reservation(
     val totalTime: Long = 90L,
     val dayOfTheReservation: LocalDate,
     val timeOfTheReservation: LocalTime,
+    var status: ReservationStatus = ReservationStatus.OPEN,
 )

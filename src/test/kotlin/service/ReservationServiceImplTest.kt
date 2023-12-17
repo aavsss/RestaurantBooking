@@ -19,6 +19,7 @@ class ReservationServiceImplTest {
     private lateinit var reservationServiceImpl: ReservationServiceImpl
 
     private val waitListUuid = UUID.randomUUID()
+
     @BeforeEach
     fun setup() {
         reservationRepo = ReservationRepo()
@@ -42,10 +43,14 @@ class ReservationServiceImplTest {
     @Test
     fun deleteReservation_publishesEvent() {
         val uuidToDelete = reservationRepo.reservationSet.first()
+        val reservationEventListener = ReservationEventListener(reservationRepo)
+        reservationEventListener.startListening()
         val deletedReservationUuid = reservationServiceImpl.deleteReservation(uuidToDelete.id)
 
-        Assertions.assertNotNull(reservationRepo.reservationSet.firstOrNull {
-            it.id == waitListUuid
-        })
+        Assertions.assertNotNull(
+            reservationRepo.reservationSet.firstOrNull {
+                it.id == waitListUuid
+            },
+        )
     }
 }

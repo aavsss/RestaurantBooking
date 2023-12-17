@@ -52,4 +52,12 @@ class ReservationServiceImpl(
     override fun addToWaitList(reservation: Reservation): UUID {
         return reservationDao.addToWaitList(reservation)
     }
+
+    override fun checkInReservation(reservationId: UUID): Reservation {
+        return reservationDao.checkInReservation(reservationId)
+    }
+
+    override fun checkoutReservation(reservationId: UUID): Reservation {
+        return reservationDao.checkoutReservation(reservationId)
+    }
 }

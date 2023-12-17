@@ -5,10 +5,11 @@ import kotlinx.coroutines.*
 import java.util.UUID
 
 class ReservationEventListener(
-    reservationRepo: ReservationRepo,
+    private val reservationRepo: ReservationRepo,
 ) {
-    init {
-        val scope = CoroutineScope(Dispatchers.IO)
+
+    fun startListening() {
+        val scope = CoroutineScope(Dispatchers.Main)
         scope.launch {
             ReservationEventBusImpl.subscribe<UUID> {
                 // get another reservation from wait-list

@@ -13,4 +13,6 @@ interface ReservationDao {
     fun getSummary(dateOfReservation: LocalDate): String
     fun getWaitList(): LinkedList<Reservation>
     fun addToWaitList(reservation: Reservation): UUID
+    fun checkInReservation(reservationId: UUID): Reservation
+    fun checkoutReservation(reservationId: UUID): Reservation
 }

@@ -12,4 +12,6 @@ interface ReservationService {
     fun getReservationsOfTheDay(date: LocalDate): List<Reservation>
     fun getSummary(dateOfReservation: LocalDate): String
     fun addToWaitList(reservation: Reservation): UUID
+    fun checkInReservation(reservationId: UUID): Reservation
+    fun checkoutReservation(reservationId: UUID): Reservation
 }
