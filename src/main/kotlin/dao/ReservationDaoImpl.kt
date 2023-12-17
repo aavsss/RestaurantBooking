@@ -56,10 +56,12 @@ class ReservationDaoImpl(
     }
 
     override fun getSummary(dateOfReservation: LocalDate): String {
-        val numberOfPeople = reservationRepo.reservationSet.sumOf {
-            it.totalNumberOfPeople
-        }
-        return "Summary of the day $dateOfReservation: $numberOfPeople"
+        val numberOfPeople = reservationRepo.reservationSet
+            .filter { it.dayOfTheReservation == dateOfReservation }
+            .sumOf { it.totalNumberOfPeople }
+        return "Summary of the day $dateOfReservation: " +
+                "Total number of people to serve today: $numberOfPeople" +
+                "Number of people in waitList ${reservationRepo.waitList.size}"
     }
 
     override fun getWaitList(): LinkedList<Reservation> {
