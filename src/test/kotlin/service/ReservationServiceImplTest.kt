@@ -4,6 +4,8 @@ import TestUtils
 import dao.ReservationDao
 import dao.ReservationDaoImpl
 import dao.ReservationRepo
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import model.Reservation
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -17,6 +19,7 @@ class ReservationServiceImplTest {
     private lateinit var reservationDao: ReservationDao
     private lateinit var reservationFinder: ReservationFinder
     private lateinit var reservationServiceImpl: ReservationServiceImpl
+    private lateinit var reservationDeleteEventHandlerImpl: ReservationDeleteEventHandlerImpl
 
     private val waitListUuid = UUID.randomUUID()
 
@@ -37,16 +40,17 @@ class ReservationServiceImplTest {
         )
         reservationFinder = ReservationFinder(reservationRepo)
         reservationDao = ReservationDaoImpl(reservationFinder, reservationRepo)
-        reservationServiceImpl = ReservationServiceImpl(reservationDao, reservationFinder)
+        reservationDeleteEventHandlerImpl = ReservationDeleteEventHandlerImpl()
+        reservationServiceImpl = ReservationServiceImpl(reservationDao, reservationFinder, reservationDeleteEventHandlerImpl)
     }
 
     @Test
-    fun deleteReservation_publishesEvent() {
+    fun deleteReservation_publishesEvent() = runBlocking {
         val uuidToDelete = reservationRepo.reservationSet.first()
-        val reservationEventListener = ReservationEventListener(reservationRepo)
-        reservationEventListener.startListening()
+        val reservationDeleteEventListener = ReservationDeleteEventListener(reservationRepo, reservationDeleteEventHandlerImpl)
         val deletedReservationUuid = reservationServiceImpl.deleteReservation(uuidToDelete.id)
 
+        delay(1500)
         Assertions.assertNotNull(
             reservationRepo.reservationSet.firstOrNull {
                 it.id == waitListUuid

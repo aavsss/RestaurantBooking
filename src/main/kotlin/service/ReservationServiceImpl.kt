@@ -1,8 +1,6 @@
 package service
 
 import dao.ReservationDao
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import model.Reservation
 import java.time.LocalDate
@@ -11,9 +9,8 @@ import java.util.*
 class ReservationServiceImpl(
     private val reservationDao: ReservationDao,
     private val reservationFinder: ReservationFinder,
+    private val reservationDeleteEventHandlerImpl: ReservationDeleteEventHandlerImpl,
 ) : ReservationService {
-
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     override fun createReservation(reservation: Reservation): UUID {
         if (!reservationFinder.isReservationValidToUpsert(reservation)) {
@@ -30,7 +27,7 @@ class ReservationServiceImpl(
     override fun deleteReservation(reservationId: UUID): UUID? = runBlocking {
         return@runBlocking try {
             val deletedUuid = reservationDao.deleteReservation(reservationId)
-            ReservationEventBusImpl.publish(reservationId)
+            reservationDeleteEventHandlerImpl.publish(reservationId)
             deletedUuid
         } catch (e: Exception) {
             null
