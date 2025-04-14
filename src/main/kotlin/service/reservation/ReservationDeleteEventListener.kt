@@ -1,6 +1,6 @@
-package service
+package service.reservation
 
-import dao.ReservationRepo
+import dao.reservation.ReservationRepo
 
 class ReservationDeleteEventListener(
     private val reservationRepo: ReservationRepo,

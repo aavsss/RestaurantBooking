@@ -1,21 +1,27 @@
 package service
 
 import TestUtils
-import dao.ReservationDao
-import dao.ReservationDaoImpl
-import dao.ReservationRepo
+import dao.RestaurantConfig
+import dao.reservation.ReservationDao
+import dao.reservation.ReservationDaoImpl
+import dao.reservation.ReservationRepo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import model.Reservation
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import service.reservation.ReservationDeleteEventHandlerImpl
+import service.reservation.ReservationDeleteEventListener
+import service.reservation.ReservationFinder
+import service.reservation.ReservationServiceImpl
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
 
 class ReservationServiceImplTest {
     private lateinit var reservationRepo: ReservationRepo
+    private lateinit var restaurantConfig: RestaurantConfig
     private lateinit var reservationDao: ReservationDao
     private lateinit var reservationFinder: ReservationFinder
     private lateinit var reservationServiceImpl: ReservationServiceImpl
@@ -26,6 +32,7 @@ class ReservationServiceImplTest {
     @BeforeEach
     fun setup() {
         reservationRepo = ReservationRepo()
+        restaurantConfig = RestaurantConfig()
         this.reservationRepo.reservationSet.addAll(TestUtils.reservations)
         this.reservationRepo.waitList.addAll(
             listOf(
@@ -38,7 +45,7 @@ class ReservationServiceImplTest {
                 ),
             ),
         )
-        reservationFinder = ReservationFinder(reservationRepo)
+        reservationFinder = ReservationFinder(reservationRepo, restaurantConfig)
         reservationDao = ReservationDaoImpl(reservationFinder, reservationRepo)
         reservationDeleteEventHandlerImpl = ReservationDeleteEventHandlerImpl()
         reservationServiceImpl = ReservationServiceImpl(reservationDao, reservationFinder, reservationDeleteEventHandlerImpl)
@@ -47,8 +54,8 @@ class ReservationServiceImplTest {
     @Test
     fun deleteReservation_publishesEvent() = runBlocking {
         val uuidToDelete = reservationRepo.reservationSet.first()
-        val reservationDeleteEventListener = ReservationDeleteEventListener(reservationRepo, reservationDeleteEventHandlerImpl)
-        val deletedReservationUuid = reservationServiceImpl.deleteReservation(uuidToDelete.id)
+        ReservationDeleteEventListener(reservationRepo, reservationDeleteEventHandlerImpl)
+        reservationServiceImpl.deleteReservation(uuidToDelete.id)
 
         delay(1500)
         Assertions.assertNotNull(

@@ -1,6 +1,7 @@
-package service
+package service.reservation
 
-import dao.ReservationRepo
+import dao.RestaurantConfig
+import dao.reservation.ReservationRepo
 import model.Reservation
 import java.time.LocalDate
 import java.time.LocalTime
@@ -10,6 +11,7 @@ import kotlin.math.abs
 
 class ReservationFinder(
     private val reservationRepo: ReservationRepo,
+    private val restaurantConfig: RestaurantConfig,
 ) {
     fun isReservationValidToUpsert(
         reservationToAdd: Reservation,
@@ -20,28 +22,28 @@ class ReservationFinder(
             .filter {
                 isWithin90Minutes(it.timeOfTheReservation, reservationToAdd.timeOfTheReservation)
             }
-        val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / reservationRepo.numberOfSeatingPerTable)
+        val numberOfTablesNeeded = (addOneToSeatIfOddNumberOfPeople(reservationToAdd.totalNumberOfPeople) / restaurantConfig.numberOfSeatingPerTable)
 
         if (reservationsWithin90Mins.isNotEmpty()) {
             val numberOfTablesTaken = reservationsWithin90Mins.sumOf {
-                (addOneToSeatIfOddNumberOfPeople(it.totalNumberOfPeople)) / reservationRepo.numberOfSeatingPerTable
+                (addOneToSeatIfOddNumberOfPeople(it.totalNumberOfPeople)) / restaurantConfig.numberOfSeatingPerTable
             }
 
             if (
-                (numberOfTablesTaken + numberOfTablesNeeded) > reservationRepo.totalNumberOfTables
+                (numberOfTablesTaken + numberOfTablesNeeded) > restaurantConfig.totalNumberOfTables
             ) {
                 return false
             }
         }
 
-        if (numberOfTablesNeeded > reservationRepo.totalNumberOfTables) return false
+        if (numberOfTablesNeeded > restaurantConfig.totalNumberOfTables) return false
         return true
     }
 
     fun findAlternateDates(dayOfTheReservation: LocalDate): List<LocalTime> {
-        var currentTime = reservationRepo.startTime
+        var currentTime = restaurantConfig.startTime
         val times = mutableListOf<LocalTime>()
-        while (currentTime.isBefore(reservationRepo.endTime)) {
+        while (currentTime.isBefore(restaurantConfig.endTime)) {
             val free90MinWindow = reservationRepo.reservationSet
                 .filter { it.dayOfTheReservation == dayOfTheReservation }
                 .any { isWithin90Minutes(it.timeOfTheReservation, currentTime) }

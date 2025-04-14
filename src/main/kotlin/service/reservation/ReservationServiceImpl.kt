@@ -1,6 +1,6 @@
-package service
+package service.reservation
 
-import dao.ReservationDao
+import dao.reservation.ReservationDao
 import kotlinx.coroutines.runBlocking
 import model.Reservation
 import java.time.LocalDate

@@ -1,8 +1,8 @@
-package dao
+package dao.reservation
 
 import model.Reservation
 import model.ReservationStatus
-import service.ReservationFinder
+import service.reservation.ReservationFinder
 import java.time.LocalDate
 import java.util.*
 
@@ -60,8 +60,8 @@ class ReservationDaoImpl(
             .filter { it.dayOfTheReservation == dateOfReservation }
             .sumOf { it.totalNumberOfPeople }
         return "Summary of the day $dateOfReservation: " +
-                "Total number of people to serve today: $numberOfPeople" +
-                "Number of people in waitList ${reservationRepo.waitList.size}"
+            "Total number of people to serve today: $numberOfPeople" +
+            "Number of people in waitList ${reservationRepo.waitList.size}"
     }
 
     override fun getWaitList(): LinkedList<Reservation> {

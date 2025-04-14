@@ -1,4 +1,4 @@
-package service
+package service.reservation
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -14,12 +14,10 @@ class ReservationDeleteEventHandlerImpl {
 
     inline fun subscribe(crossinline onEvent: (UUID) -> Unit) = runBlocking {
         val subscribingScope = CoroutineScope(SupervisorJob())
-        delay(1300)
         subscribingScope.launch {
             events.collect {
                 onEvent(it)
             }
         }
-        delay(3000)
     }
 }

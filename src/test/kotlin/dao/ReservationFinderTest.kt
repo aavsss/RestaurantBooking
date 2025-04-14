@@ -1,10 +1,11 @@
 package dao
 
 import TestUtils
+import dao.reservation.ReservationRepo
 import model.Reservation
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import service.ReservationFinder
+import service.reservation.ReservationFinder
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
@@ -14,15 +15,17 @@ import kotlin.test.assertTrue
 
 class ReservationFinderTest {
     private lateinit var reservationRepo: ReservationRepo
+    private lateinit var restaurantConfig: RestaurantConfig
     private lateinit var reservationFinder: ReservationFinder
 
     @BeforeEach
     fun setup() {
         this.reservationRepo = ReservationRepo()
+        this.restaurantConfig = RestaurantConfig()
         this.reservationRepo.reservationSet.addAll(
             TestUtils.reservations,
         )
-        this.reservationFinder = ReservationFinder(reservationRepo)
+        this.reservationFinder = ReservationFinder(reservationRepo, restaurantConfig)
     }
 
     @Test
