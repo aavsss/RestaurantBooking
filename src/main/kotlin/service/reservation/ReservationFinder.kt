@@ -30,7 +30,7 @@ class ReservationFinder(
             }
 
             if (
-                (numberOfTablesTaken + numberOfTablesNeeded) > restaurantConfig.totalNumberOfTables
+                (numberOfTablesTaken + numberOfTablesNeeded) > restaurantConfig.totalNumberOfTables // todo: need to see if table is free at that time
             ) {
                 return false
             }

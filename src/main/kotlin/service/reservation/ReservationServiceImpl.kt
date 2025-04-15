@@ -1,14 +1,17 @@
 package service.reservation
 
+import dao.RestaurantConfig
 import dao.reservation.ReservationDao
 import kotlinx.coroutines.runBlocking
 import model.Reservation
+import model.TableStatus
 import java.time.LocalDate
 import java.util.*
 
 class ReservationServiceImpl(
     private val reservationDao: ReservationDao,
     private val reservationFinder: ReservationFinder,
+    private val restaurantConfig: RestaurantConfig,
     private val reservationDeleteEventHandlerImpl: ReservationDeleteEventHandlerImpl,
 ) : ReservationService {
 
@@ -50,11 +53,29 @@ class ReservationServiceImpl(
         return reservationDao.addToWaitList(reservation)
     }
 
+    override fun removeFromWaitList(reservation: Reservation): Reservation {
+        val firstInLineReservation = reservationDao.removeFromWaitList(reservation)
+        reservationDao.checkInReservation(firstInLineReservation.id)
+        reservation.table = restaurantConfig.assignTable(firstInLineReservation.id)
+        return firstInLineReservation
+    }
+
     override fun checkInReservation(reservationId: UUID): Reservation {
-        return reservationDao.checkInReservation(reservationId)
+        if (restaurantConfig.tableStatus.none { it.table.tableStatus == TableStatus.OPEN }) {
+            println("All tables are taken, added to wait list")
+            addToWaitList(getReservation(reservationId))
+        }
+        val reservation = reservationDao.checkInReservation(reservationId)
+        reservation.table = restaurantConfig.assignTable(reservationId)
+        return reservation
     }
 
     override fun checkoutReservation(reservationId: UUID): Reservation {
-        return reservationDao.checkoutReservation(reservationId)
+        val reservation = reservationDao.checkoutReservation(reservationId)
+
+        restaurantConfig.unAssignTable(reservationId)
+        reservation.table = null
+
+        return reservation
     }
 }

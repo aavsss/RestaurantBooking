@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
     // service
     val reservationDeleteEventHandlerImpl = ReservationDeleteEventHandlerImpl()
     val reservationDeleteEventListener = ReservationDeleteEventListener(reservationRepo, reservationDeleteEventHandlerImpl)
-    val reservationService = ReservationServiceImpl(reservationDao, reservationFinder, reservationDeleteEventHandlerImpl)
+    val reservationService = ReservationServiceImpl(reservationDao, reservationFinder, restaurantConfig, reservationDeleteEventHandlerImpl)
     val orderService = OrderServiceImpl(orderDao)
 
     // simulation
@@ -53,13 +53,58 @@ fun main(args: Array<String>) {
             timeOfTheReservation = LocalTime.of(9, 15),
         ),
     )
+    val anniversaryReservation = reservationService.createReservation(
+        Reservation(
+            id = UUID.randomUUID(),
+            name = "Momo party",
+            totalNumberOfPeople = 2,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(9, 15),
+        ),
+    )
+    val marvelRivalsReservation = reservationService.createReservation(
+        Reservation(
+            id = UUID.randomUUID(),
+            name = "Momo party",
+            totalNumberOfPeople = 2,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(9, 15),
+        ),
+    )
+    val survivalReservation = reservationService.createReservation(
+        Reservation(
+            id = UUID.randomUUID(),
+            name = "Momo party",
+            totalNumberOfPeople = 2,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(9, 15),
+        ),
+    )
+    val earlyBirdParty = reservationService.createReservation(
+        Reservation(
+            id = UUID.randomUUID(),
+            name = "Momo party",
+            totalNumberOfPeople = 2,
+            dayOfTheReservation = LocalDate.of(2023, 12, 1),
+            timeOfTheReservation = LocalTime.of(4, 0),
+        ),
+    )
+
+    // check in reservation for tables to be assigned
+    reservationService.checkInReservation(earlyBirdParty)
+
+    // todo: what to do if people haven't checkout out after their allocated time
+    reservationService.checkInReservation(pizzaPartyReservationId)
+    reservationService.checkInReservation(momoPartyReservationId)
+    reservationService.checkInReservation(anniversaryReservation)
+    reservationService.checkInReservation(marvelRivalsReservation)
+    reservationService.checkInReservation(survivalReservation)
 
     orderService.placeOrder(
         Order(
             id = UUID.randomUUID(),
             reservationId = momoPartyReservationId,
             menuItems = mutableListOf(MenuItem.MOMO),
-            tableId = restaurantConfig.assignTable(momoPartyReservationId).id,
         ),
     )
 
@@ -68,13 +113,20 @@ fun main(args: Array<String>) {
             id = UUID.randomUUID(),
             reservationId = pizzaPartyReservationId,
             menuItems = mutableListOf(MenuItem.PIZZA),
-            tableId = restaurantConfig.assignTable(pizzaPartyReservationId).id,
         ),
     )
 
     // State
     println("table status: ${restaurantConfig.tableStatus}")
 
+    // checkout
+    reservationService.checkoutReservation(pizzaPartyReservationId)
+    reservationService.checkoutReservation(momoPartyReservationId)
+    reservationService.checkoutReservation(anniversaryReservation)
+    reservationService.checkoutReservation(marvelRivalsReservation)
+    reservationService.checkoutReservation(survivalReservation)
+
     println("momo party order total: ${orderRepo.orderList[0].calculateTotal()}")
     println("pizza party order total: ${orderRepo.orderList[1].calculateTotal()}")
+    println("table status: ${restaurantConfig.tableStatus}")
 }

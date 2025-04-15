@@ -64,13 +64,18 @@ class ReservationDaoImpl(
             "Number of people in waitList ${reservationRepo.waitList.size}"
     }
 
-    override fun getWaitList(): LinkedList<Reservation> {
+    override fun getWaitList(): MutableList<Reservation> {
         return reservationRepo.waitList
     }
 
     override fun addToWaitList(reservation: Reservation): UUID {
         reservationRepo.waitList.add(reservation)
         return reservation.id
+    }
+
+    override fun removeFromWaitList(reservation: Reservation): Reservation {
+        reservationRepo.waitList.removeIf { it.id == reservation.id }
+        return reservation
     }
 
     override fun checkInReservation(reservationId: UUID): Reservation {

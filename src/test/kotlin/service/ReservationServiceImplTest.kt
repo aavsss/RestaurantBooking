@@ -48,7 +48,7 @@ class ReservationServiceImplTest {
         reservationFinder = ReservationFinder(reservationRepo, restaurantConfig)
         reservationDao = ReservationDaoImpl(reservationFinder, reservationRepo)
         reservationDeleteEventHandlerImpl = ReservationDeleteEventHandlerImpl()
-        reservationServiceImpl = ReservationServiceImpl(reservationDao, reservationFinder, reservationDeleteEventHandlerImpl)
+        reservationServiceImpl = ReservationServiceImpl(reservationDao, reservationFinder, restaurantConfig, reservationDeleteEventHandlerImpl)
     }
 
     @Test

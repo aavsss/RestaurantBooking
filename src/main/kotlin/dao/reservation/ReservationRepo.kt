@@ -1,9 +1,11 @@
 package dao.reservation
 
 import model.Reservation
-import java.util.LinkedList
 
 class ReservationRepo {
+    /**
+     * Represents all the reservation
+     */
     val reservationSet: MutableSet<Reservation> = mutableSetOf()
-    val waitList: LinkedList<Reservation> = LinkedList()
+    val waitList: MutableList<Reservation> = mutableListOf()
 }
