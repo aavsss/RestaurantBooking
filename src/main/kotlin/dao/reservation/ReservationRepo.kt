@@ -8,4 +8,5 @@ class ReservationRepo {
      */
     val reservationSet: MutableSet<Reservation> = mutableSetOf()
     val waitList: MutableList<Reservation> = mutableListOf()
+    val pastReservationSet: MutableSet<Reservation> = mutableSetOf()
 }

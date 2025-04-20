@@ -31,13 +31,16 @@ class ReservationDaoImpl(
         return updatedReservation.id
     }
 
-    override fun deleteReservation(reservationId: UUID): UUID {
-        val isRemoved = reservationRepo.reservationSet.removeIf {
+    override fun deleteReservation(reservationId: UUID): Reservation {
+        val toBeDeletedReservation = reservationRepo.reservationSet.firstOrNull {
+            it.id == reservationId
+        } ?: throw Exception("Reservation not found")
+
+       reservationRepo.reservationSet.removeIf {
             it.id == reservationId
         }
 
-        if (!isRemoved) throw Exception("Reservation not found")
-        return reservationId
+        return toBeDeletedReservation
     }
 
     override fun getReservation(reservationId: UUID): Reservation {
@@ -87,6 +90,11 @@ class ReservationDaoImpl(
     override fun checkoutReservation(reservationId: UUID): Reservation {
         val reservation = getReservation(reservationId)
         reservation.status = ReservationStatus.CHECKED_OUT
+        return reservation
+    }
+
+    override fun moveToPastReservationSet(reservation: Reservation): Reservation {
+        reservationRepo.pastReservationSet.add(reservation)
         return reservation
     }
 }

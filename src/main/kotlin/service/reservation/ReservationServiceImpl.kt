@@ -15,9 +15,14 @@ class ReservationServiceImpl(
     private val reservationDeleteEventHandlerImpl: ReservationDeleteEventHandlerImpl,
 ) : ReservationService {
 
-    override fun createReservation(reservation: Reservation): UUID {
+    override fun createReservation(reservation: Reservation, addToWaitList: Boolean): UUID {
         if (!reservationFinder.isReservationValidToUpsert(reservation)) {
             val alternateTimes = reservationFinder.findAlternateDates(reservation.dayOfTheReservation)
+            if (addToWaitList) {
+                reservationDao.addToWaitList(reservation)
+                println("Added to wait list.")
+                return reservation.id
+            }
             throw Exception("Time already booked. Pick some other time: $alternateTimes")
         }
         return reservationDao.createReservation(reservation)
@@ -29,9 +34,9 @@ class ReservationServiceImpl(
 
     override fun deleteReservation(reservationId: UUID): UUID? = runBlocking {
         return@runBlocking try {
-            val deletedUuid = reservationDao.deleteReservation(reservationId)
+            val deletedReservation = reservationDao.deleteReservation(reservationId)
             reservationDeleteEventHandlerImpl.publish(reservationId)
-            deletedUuid
+            deletedReservation.id
         } catch (e: Exception) {
             null
         }
@@ -53,7 +58,7 @@ class ReservationServiceImpl(
         return reservationDao.addToWaitList(reservation)
     }
 
-    override fun removeFromWaitList(reservation: Reservation): Reservation {
+    override fun removeFromWaitListAndCheckIn(reservation: Reservation): Reservation {
         val firstInLineReservation = reservationDao.removeFromWaitList(reservation)
         reservationDao.checkInReservation(firstInLineReservation.id)
         reservation.table = restaurantConfig.assignTable(firstInLineReservation.id)
@@ -72,7 +77,8 @@ class ReservationServiceImpl(
 
     override fun checkoutReservation(reservationId: UUID): Reservation {
         val reservation = reservationDao.checkoutReservation(reservationId)
-
+        reservationDao.moveToPastReservationSet(reservation)
+        reservationDao.deleteReservation(reservationId)
         restaurantConfig.unAssignTable(reservationId)
         reservation.table = null
 
