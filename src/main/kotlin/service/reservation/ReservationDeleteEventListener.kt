@@ -1,10 +1,12 @@
 package service.reservation
 
 import dao.reservation.ReservationRepo
+import model.ReservationStatus
 
 class ReservationDeleteEventListener(
-    private val reservationRepo: ReservationRepo,
     private val reservationDeleteEventHandlerImpl: ReservationDeleteEventHandlerImpl,
+    private val reservationService: ReservationService,
+    private val waitListService: WaitListService,
 ) {
 
     init {
@@ -13,8 +15,10 @@ class ReservationDeleteEventListener(
 
     private fun startListening() {
         reservationDeleteEventHandlerImpl.subscribe {
-            val waitListedReservation = reservationRepo.waitList.pop()
-            reservationRepo.reservationSet.add(waitListedReservation)
+            val reservationToBeAdded = waitListService.getWaitList().first {
+                it.status == ReservationStatus.WAITING_TO_BE_CHECKED_IN
+            }
+            reservationService.removeFromWaitListAndCheckIn(reservationToBeAdded)
         }
     }
 }

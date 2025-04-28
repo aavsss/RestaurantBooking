@@ -36,7 +36,7 @@ class ReservationDaoImpl(
             it.id == reservationId
         } ?: throw Exception("Reservation not found")
 
-       reservationRepo.reservationSet.removeIf {
+        reservationRepo.reservationSet.removeIf {
             it.id == reservationId
         }
 

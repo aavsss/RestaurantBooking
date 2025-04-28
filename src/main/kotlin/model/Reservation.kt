@@ -12,6 +12,7 @@ data class Reservation(
     val dayOfTheReservation: LocalDate,
     val timeOfTheReservation: LocalTime,
     var status: ReservationStatus = ReservationStatus.OPEN,
+    val guests: MutableList<Guest> = mutableListOf()
 ) {
     var table: Table? = null
 }

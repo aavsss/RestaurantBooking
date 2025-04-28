@@ -8,6 +8,7 @@ import dao.reservation.ReservationRepo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import model.Reservation
+import model.ReservationStatus
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,6 +43,7 @@ class ReservationServiceImplTest {
                     totalNumberOfPeople = 3,
                     dayOfTheReservation = LocalDate.of(2023, 12, 1),
                     timeOfTheReservation = LocalTime.of(9, 15),
+                    status = ReservationStatus.WAITING_TO_BE_CHECKED_IN,
                 ),
             ),
         )
@@ -54,7 +56,7 @@ class ReservationServiceImplTest {
     @Test
     fun deleteReservation_publishesEvent() = runBlocking {
         val uuidToDelete = reservationRepo.reservationSet.first()
-        ReservationDeleteEventListener(reservationRepo, reservationDeleteEventHandlerImpl)
+        ReservationDeleteEventListener(reservationDeleteEventHandlerImpl, reservationServiceImpl)
         reservationServiceImpl.deleteReservation(uuidToDelete.id)
 
         delay(1500)
